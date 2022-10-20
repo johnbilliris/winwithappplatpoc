@@ -1,0 +1,41 @@
+name: Deploy infrastructure to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - setup/**
+  workflow_dispatch:
+
+jobs:
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@master
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy template to create resource group
+        uses: azure/arm-deploy@v1
+        id: deploy-resource-group
+        with:
+          scope: subscription
+          region: australiaeast
+          template: ./setup/deploy-resourcegroup.bicep
+          parameters: ./setup/deploy-resourcegroup.parameters.json
+
+      - name: Deploy template to create infra
+        uses: azure/arm-deploy@v1
+        id: deploy-infra
+        with:
+          scope: resourcegroup
+          resourceGroupName: ${{ steps.deploy-resource-group.outputs.resourceGroupNameOutput }}
+          region: australiaeast
+          template: ./setup/deploy.bicep
+          parameters: ./setup/deploy.parameters.json
