@@ -37,5 +37,5 @@ jobs:
           scope: resourcegroup
           resourceGroupName: ${{ steps.deploy-resource-group.outputs.resourceGroupNameOutput }}
           region: australiaeast
-          template: ./setup/deploy.bicep
-          parameters: ./setup/deploy.parameters.json
+          template: ./setup/template.json
+          parameters: ./setup/template.parameters.json
